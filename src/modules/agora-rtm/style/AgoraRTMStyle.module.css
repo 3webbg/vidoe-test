@@ -1,0 +1,53 @@
+.chat_wrapper {
+    color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.bubble_holder {
+    display: flex;
+    flex-flow: column;
+    overflow-y: scroll;
+}
+.text_field {
+    margin-top: auto;
+    display: flex;
+}
+.text_input,
+.send_text {
+    background: none;
+    color: inherit;
+    border: none;
+    border-top: 2px #00b6ed solid;
+
+    padding: 0;
+    font: inherit;
+
+    outline: inherit;
+}
+
+.text_input {
+    width: 85%;
+    padding-left: 10px;
+}
+.send_text {
+    width: 15%;
+    cursor: pointer;
+}
+.bubble {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    width: calc(100% - 20px);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #00b6ed;
+}
+.bubble span {
+    font-weight: 700;
+}
