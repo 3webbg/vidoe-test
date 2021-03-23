@@ -17,6 +17,7 @@ import {
   faUsers,
   faUsersSlash,
 } from '@fortawesome/free-solid-svg-icons'
+import Cookies from 'js-cookie'
 const tile_canvas = {
   1: ['span 12/span 24'],
   2: ['span 12/span 12/13/25', 'span 12/span 12/13/13'],
@@ -64,25 +65,25 @@ class AgoraCanvas extends React.Component {
     this.localStream = {}
     this.shareClient = {}
     this.shareStream = {}
+    this.userType = Cookies.get('userType') || 'user'
     this.state = {
       displayMode: 'pip',
       streamList: [],
       readyState: false,
+      users: [],
     }
   }
 
   componentWillMount() {
     let $ = this.props
+    this.setState({ displayMode: $?.displayMode })
     // init AgoraRTC local client
     this.client = AgoraRTC.createClient({ mode: $.transcode })
     this.client.init($.appId, () => {
-      console.log('AgoraRTC client initialized')
       this.subscribeStreamEvents()
       this.client.join($.appId, $.channel, $.uid, (uid) => {
         console.log('User ' + uid + ' join channel successfully')
         console.log('At ' + new Date().toLocaleTimeString())
-        // create local stream
-        // It is not recommended to setState in function addStream
         this.localStream = this.streamInit(uid, $.attendeeMode, $.videoProfile)
         this.localStream.init(
           () => {
@@ -118,15 +119,17 @@ class AgoraCanvas extends React.Component {
     })
   }
 
-  // componentWillUnmount () {
-  //     // remove listener
-  //     let canvas = document.querySelector('#ag-canvas')
-  //     canvas.removeEventListener('mousemove')
-  // }
+  componentWillUnmount() {
+    // remove listener
+    let canvas = document.querySelector('#ag-canvas')
+    canvas.removeEventListener('mousemove')
+  }
 
   componentDidUpdate() {
     // rerendering
     let canvas = document.querySelector('#ag-canvas')
+    console.log('%cSTRAMLIST', 'font-size:30px', this.state.streamList)
+
     // pip mode (can only use when less than 4 people in channel)
     if (this.state.displayMode === 'pip') {
       let no = this.state.streamList.length
@@ -136,7 +139,9 @@ class AgoraCanvas extends React.Component {
       }
       this.state.streamList.map((item, index) => {
         let id = item.getId()
+        let muted = item._isAudioMuted()
         let dom = document.querySelector('#ag-item-' + id)
+        let name = document.querySelector('.ag-name')
         if (!dom) {
           dom = document.createElement('section')
           dom.setAttribute('id', 'ag-item-' + id)
@@ -144,14 +149,29 @@ class AgoraCanvas extends React.Component {
           canvas.appendChild(dom)
           item.play('ag-item-' + id)
         }
-        if (index === no - 1) {
-          dom.setAttribute('style', `grid-area: span 12/span 24/13/25`)
-        } else {
+        //name
+        if (!name) {
+          name = document.createElement('div')
+          name.setAttribute('id', 'ag-name' + id)
+          name.setAttribute('class', 'ag-name')
+          dom.appendChild(name)
+        }
+
+        name.innerHTML = `${
+          id.startsWith('user')
+            ? id.substring(4, id.length - 5)
+            : id.substring(7, id.length - 5)
+        } ${muted ? 'Muted' : 'Unmuted'}`
+        console.log('%cmutedvalue', 'color:yellow', muted)
+        // if (index === no - 1)
+        if (id.startsWith('user')) {
           dom.setAttribute(
-            'style',
-            `grid-area: span 3/span 4/${4 + 3 * index}/25;
+            'style', //remove - 3 if using index === no - 1
+            `grid-area: span 3/span 4/${4 + 3 * index - 3}/25; 
                     z-index:1;width:calc(100% - 20px);height:calc(100% - 20px)`
           )
+        } else {
+          dom.setAttribute('style', `grid-area: span 12/span 24/13/25`)
         }
 
         if (item.player) {
@@ -162,9 +182,12 @@ class AgoraCanvas extends React.Component {
     // tile mode
     else if (this.state.displayMode === 'tile') {
       let no = this.state.streamList.length
+
       this.state.streamList.map((item, index) => {
         let id = item.getId()
+        let muted = item._isAudioMuted()
         let dom = document.querySelector('#ag-item-' + id)
+        let name = document.querySelector('#ag-name' + id)
         if (!dom) {
           dom = document.createElement('section')
           dom.setAttribute('id', 'ag-item-' + id)
@@ -172,8 +195,24 @@ class AgoraCanvas extends React.Component {
           canvas.appendChild(dom)
           item.play('ag-item-' + id)
         }
+
+        //name
+        if (!name) {
+          name = document.createElement('div')
+          name.setAttribute('id', 'ag-name' + id)
+          name.setAttribute('class', 'ag-name')
+          dom.appendChild(name)
+        }
+
+        name.innerHTML = `${
+          id.startsWith('user')
+            ? id.substring(4, id.length - 5)
+            : id.substring(7, id.length - 5)
+        } ${muted ? 'Muted' : 'Unmuted'}`
+        console.log('%cmutedvalue', 'color:yellow', muted)
+
         dom.setAttribute('style', `grid-area: ${tile_canvas[no][index]}`)
-        item.player.resize && item.player.resize()
+        item?.player?.resize && item.player.resize()
       })
     }
     // screen share mode (tbd)
@@ -223,14 +262,24 @@ class AgoraCanvas extends React.Component {
 
   subscribeStreamEvents = () => {
     let rt = this
+    let $ = this.props
     rt.client.on('stream-added', function (evt) {
       let stream = evt.stream
       console.log('New stream added: ' + stream.getId())
       console.log('At ' + new Date().toLocaleTimeString())
       console.log('Subscribe ', stream)
-      rt.client.subscribe(stream, function (err) {
-        console.log('Subscribe stream failed', err)
-      })
+
+      const id = stream.getId()
+      if (id.startsWith('trainer') && $.userType === 'user') {
+        rt.client.subscribe(stream, function (err) {
+          console.log('Subscribe stream failed', err)
+        })
+      }
+      if ($.userType === 'trainer') {
+        rt.client.subscribe(stream, function (err) {
+          console.log('Subscribe stream failed', err)
+        })
+      }
     })
 
     rt.client.on('peer-leave', function (evt) {
@@ -255,6 +304,16 @@ class AgoraCanvas extends React.Component {
       console.log(new Date().toLocaleTimeString())
       console.log(evt)
       rt.removeStream(stream.getId())
+    })
+    //VOLUME INDICATOR
+    rt.client.on('volume-indicator', function (evt) {
+      evt.attr.forEach(function (volume, index) {
+        console.log(`${index} UID ${volume.uid} Level ${volume.level}`)
+      })
+    })
+
+    rt.client.on('peer-online', function (evt) {
+      console.log('peer-online', evt.uid)
     })
   }
 
@@ -309,6 +368,7 @@ class AgoraCanvas extends React.Component {
     this.localStream.isAudioOn()
       ? this.localStream.disableAudio()
       : this.localStream.enableAudio()
+    this.forceUpdate()
   }
   openChat = (e) => {
     e.currentTarget.classList.toggle('off')

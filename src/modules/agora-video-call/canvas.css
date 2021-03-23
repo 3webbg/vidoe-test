@@ -7,13 +7,27 @@
 }
 
 .ag-item {
-  border-radius: 6px;
-  border: 2px #00B6ED solid;
+  border-radius: 10px;
+  position: relative;
   background: url('../../assets/images/avatar.png') center no-repeat;
   height: 100%;
   width: 100%;
+  z-index: 0;
+  overflow: hidden;
 }
-
+.ag-name {
+  position: absolute;
+  bottom: 0px;
+  height: 20px;
+  line-height: 20px;
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  z-index: 1;
+  font-family: MontserratBold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+}
 #ag-resize-container {
   background-image: none !important;
   background-color: black;
@@ -25,7 +39,6 @@
 #ag-resize-container .ag-item {
   border: none !important;
 }
-
 
 /* button group */
 
@@ -44,7 +57,7 @@
 
 .ag-btn-group:hover,
 .ag-btn-group.active {
-  background: rgba(18, 74, 99, .8);
+  background: rgba(18, 74, 99, 0.8);
 }
 
 .ag-btn {
@@ -61,12 +74,12 @@
 }
 
 .ag-btn:hover {
-  color: #00B6ED;
+  color: #00b6ed;
 }
 
 .ag-btn.disabled,
 .ag-btn.disabled:hover {
-  color: #637C8E;
+  color: #637c8e;
   cursor: not-allowed;
 }
 

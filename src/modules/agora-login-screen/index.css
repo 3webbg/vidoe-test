@@ -1,30 +1,33 @@
 ::-webkit-scrollbar {
   width: 10px;
 }
+
 /* Track */
 ::-webkit-scrollbar-track {
   background: none;
 }
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #00b6ed;
+  background: #3800a4;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #0087b1;
+  background: #280075;
 }
 
 .index.wrapper {
-  background: url('../../assets/images/ag-index-background.png') center
-    no-repeat;
+  background: url('../../assets/images/ag-login-background.jpg') center no-repeat;
   background-size: cover;
+  box-shadow: inset 0 0 0 50vw rgba(0, 0, 0, 0.3);
   min-height: 100%;
   height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-flow: column;
+  font-family: MontserratBold;
 }
 
 .index .ag-footer {
@@ -45,7 +48,7 @@
 
 .login-wrapper {
   color: rgb(216, 216, 216);
-  width: 284px;
+  width: 310px;
   font-size: 14px;
 }
 
@@ -76,15 +79,19 @@
   padding-bottom: 30px;
 }
 
-.channel-wrapper > span {
+.channel-wrapper>span {
   height: 35px !important;
 }
 
 #channel {
-  background: transparent;
-  color: white;
-  padding: 8px 50px;
+  background: white;
+  color: black;
+  padding: 8px 10px;
   height: 35px;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
 }
 
 #channel:focus:not(.is-success):not(.is-danger) {
@@ -94,7 +101,10 @@
 #channel::-webkit-input-placeholder {
   color: white;
   opacity: 0.5;
+
 }
+
+
 
 .channel-wrapper.has-icons-left .icon.is-left {
   left: 15px;
@@ -110,11 +120,11 @@
   width: 100%;
   font-size: 18px;
   padding: 10px 10px;
-  background: rgb(0, 182, 237);
+  background: #5000eb;
 }
 
 #joinBtn:hover {
-  box-shadow: 0 2px 2px 1px #0056ed;
+  box-shadow: 0 2px 2px 1px #3800a4;
   transition: box-shadow 0.1s ease-in-out;
 }
 
@@ -148,15 +158,18 @@
   transition: 0.1s background ease-in-out;
   background: #004a65;
 }
+
 .name-input {
   background-color: transparent;
   color: white;
   padding: 0 50px;
   height: 35px;
 }
+
 .name-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
+
 .name-input:focus {
   background-color: rgb(232, 240, 254);
   color: black;
@@ -210,27 +223,23 @@
   color: #637c8e;
 }
 
-#attendeeMode input[type='radio']:checked + .radio-btn {
+#attendeeMode input[type='radio']:checked+.radio-btn {
   background: url('../../assets/images/ag-oval-active.png') no-repeat center;
 }
 
-#attendeeMode input[type='radio']:checked + .radio-btn + .radio-img.video {
+#attendeeMode input[type='radio']:checked+.radio-btn+.radio-img.video {
   background: url('../../assets/images/ag-video-active-s.png') no-repeat center;
 }
 
-#attendeeMode input[type='radio']:checked + .radio-btn + .radio-img.audio {
+#attendeeMode input[type='radio']:checked+.radio-btn+.radio-img.audio {
   background: url('../../assets/images/ag-mic-active-s.png') no-repeat center;
 }
 
-#attendeeMode input[type='radio']:checked + .radio-btn + .radio-img.audience {
+#attendeeMode input[type='radio']:checked+.radio-btn+.radio-img.audience {
   background: url('../../assets/images/ag-audience-active.png') no-repeat center;
 }
 
-#attendeeMode
-  input[type='radio']:checked
-  + .radio-btn
-  + .radio-img
-  + .radio-msg {
+#attendeeMode input[type='radio']:checked+.radio-btn+.radio-img+.radio-msg {
   color: rgb(0, 182, 237);
   opacity: 1;
 }
@@ -307,10 +316,10 @@
   align-items: center;
 }
 
-.validate-icon > .ag-icon-invalid {
+.validate-icon>.ag-icon-invalid {
   color: #d0021b;
 }
 
-.validate-icon > .ag-icon-valid {
+.validate-icon>.ag-icon-valid {
   color: #7ed321;
 }

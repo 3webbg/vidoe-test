@@ -12,18 +12,27 @@ class Index extends React.Component {
     super(props)
     this.state = {
       joinBtn: false,
-      channel: '',
+      channel: 'demo',
       baseMode: 'avc',
       transcode: 'interop',
       attendeeMode: 'video',
       videoProfile: '480p_4',
+      userType: 'user',
+      displayMode: 'pip',
     }
   }
 
   componentDidMount() {
+    console.log(this.props)
     window.addEventListener('keypress', (e) => {
       e.keyCode === 13 && this.handleJoin()
     })
+
+    if (this.props.match.path === '/user-login') {
+      this.setState({ userType: 'user', displayMode: 'tile' })
+    } else if (this.props.match.path === '/trainer-login') {
+      this.setState({ userType: 'trainer', videoProfile: '720p_3' })
+    }
   }
 
   /**
@@ -31,15 +40,23 @@ class Index extends React.Component {
    * @param {String} val 0-9 a-z A-Z _ only
    * @param {Boolean} state
    */
-  handleChannel = (val, state) => {
+  //For room
+  // handleChannel = (val, state) => {
+  //   this.setState({
+  //     channel: val,
+  //     joinBtn: state,
+  //   })
+  // }
+  handleName = (val, state) => {
     this.setState({
-      channel: val,
+      username: val,
       joinBtn: state,
     })
   }
-  handleName = (val) => {
-    this.setState({
-      username: val,
+
+  handleUserType = async (e) => {
+    await this.setState({
+      userType: e.target.value,
     })
   }
 
@@ -47,13 +64,16 @@ class Index extends React.Component {
     if (!this.state.joinBtn) {
       return
     }
-    console.log(this.state)
+
     Cookies.set('channel', this.state.channel)
     Cookies.set('baseMode', this.state.baseMode)
     Cookies.set('transcode', this.state.transcode)
     Cookies.set('attendeeMode', this.state.attendeeMode)
     Cookies.set('videoProfile', this.state.videoProfile)
     Cookies.set('username', this.state.username)
+    Cookies.set('userType', this.state.userType)
+    Cookies.set('displayMode', this.state.displayMode)
+    // window.removeEventListener('keypress', true)
     window.location.hash = 'meeting'
   }
 
@@ -71,25 +91,27 @@ class Index extends React.Component {
             <div className="login-body">
               <div className="columns">
                 <div className="column is-12">
-                  <InputChannel
+                  {/* <InputChannel
+                    value={this.state.channel}
                     onChange={this.handleChannel}
-                    placeholder="Input a room name here"
-                  ></InputChannel>
-                  <input
+                    placeholder="Въведете име на стая"
+                  ></InputChannel> */}
+                  <InputChannel
                     className="ag-rounded input name-input"
                     value={this.state.username}
-                    onChange={(e) => this.handleName(e.target.value)}
-                    placeholder="Input name here"
+                    onChange={this.handleName}
+                    placeholder="Моля въведете вашето първо име на латиница"
                     label="input name here"
-                  ></input>
+                  ></InputChannel>
                 </div>
               </div>
-              <div className="columns">
+              {/* <div className="columns">
                 <div className="column is-7">
                   <BaseOptions
                     onChange={(val) => this.setState({ baseMode: val })}
                   ></BaseOptions>
                 </div>
+
                 <div className="column is-5">
                   <AdvancedOptions
                     onRadioChange={(val) => this.setState({ transcode: val })}
@@ -158,17 +180,28 @@ class Index extends React.Component {
                     </label>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="login-footer">
-              <button
-                id="joinBtn"
-                onClick={this.handleJoin}
-                disabled={!this.state.joinBtn}
-                className="ag-rounded button is-info"
-              >
-                Join
-              </button>
+              {!this.state.username || !this.state.channel ? (
+                <button
+                  id="joinBtn"
+                  onClick={this.handleJoin}
+                  disabled={true}
+                  className="ag-rounded button is-info"
+                >
+                  Join
+                </button>
+              ) : (
+                <button
+                  id="joinBtn"
+                  onClick={this.handleJoin}
+                  disabled={false}
+                  className="ag-rounded button is-info"
+                >
+                  Join
+                </button>
+              )}
             </div>
           </section>
         </div>
@@ -196,6 +229,7 @@ class InputChannel extends React.Component {
   }
 
   validate = (val) => {
+    console.log(val)
     this.setState({
       state: '',
       errorMsg: '',
